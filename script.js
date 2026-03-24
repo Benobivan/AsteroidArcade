@@ -50,6 +50,7 @@
   function makeInitialState() {
     return {
       running: true,
+      paused: false,
       score: 0,
       lives: CONFIG.gameplay.startLives,
       wave: 1,
@@ -176,6 +177,11 @@
       case "Enter":
         if (down && !state.running) {
           restartGame();
+        }
+        break;
+      case "KeyP":
+        if (down && state.running) {
+          state.paused = !state.paused;
         }
         break;
       default:
@@ -464,6 +470,10 @@
     ctx.fillText(`Score: ${state.score}`, 20, 32);
     ctx.fillText(`Leben: ${state.lives}`, 20, 58);
     ctx.fillText(`Welle: ${state.wave}`, 20, 84);
+    if (state.paused && state.running) {
+      ctx.fillStyle = "#ffe083";
+      ctx.fillText("Status: Pausiert", 20, 110);
+    }
   }
 
   function drawGameOver(now) {
@@ -484,6 +494,20 @@
     ctx.fillText("Drücke Enter für Neustart", width / 2, height / 2 + 72);
   }
 
+  function drawPauseOverlay() {
+    if (!state.paused || !state.running) return;
+
+    ctx.fillStyle = "rgba(2, 3, 10, 0.45)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffe083";
+    ctx.font = 'bold 42px "Courier New", monospace';
+    ctx.fillText("PAUSE", width / 2, height / 2 - 8);
+    ctx.fillStyle = "#e4eeff";
+    ctx.font = '20px "Courier New", monospace';
+    ctx.fillText("Drücke P zum Fortsetzen", width / 2, height / 2 + 30);
+  }
+
   function render(now) {
     clearCanvas();
     drawAsteroids();
@@ -491,6 +515,7 @@
     drawShip(now);
     drawParticles(now);
     drawHUD();
+    drawPauseOverlay();
     drawGameOver(now);
   }
 
@@ -500,14 +525,14 @@
     const dt = Math.min(0.033, (now - state.lastTime) / 1000); // stabiler Delta-Zeitschritt
     state.lastTime = now;
 
-    if (state.running) {
+    if (state.running && !state.paused) {
       updateShip(dt, now);
       updateBullets(dt, now);
       updateAsteroids(dt);
       updateParticles(now, dt);
       handleCollisions(now);
       updateWaveProgress();
-    } else {
+    } else if (!state.running) {
       updateParticles(now, dt);
     }
 

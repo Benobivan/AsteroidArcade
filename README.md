@@ -28,6 +28,7 @@ Dann im Browser öffnen: `http://localhost:8080`
 - **Pfeil links/rechts**: Schiff drehen
 - **Pfeil hoch**: Schub
 - **Leertaste**: Schießen
+- **P**: Spiel pausieren / fortsetzen
 - **Enter**: Nach Game Over neu starten
 
 ## Gameplay-Features
